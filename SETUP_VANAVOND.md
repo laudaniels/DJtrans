@@ -55,6 +55,28 @@ Eigen tracks proberen: geef gewoon je eigen mp3's mee aan `--prev_track` /
 `--next_track`, en zet `--prev_cue`/`--next_cue` op het punt (in seconden)
 waar het vorige/volgende nummer helemaal uit-/infadet.
 
+### GUI (drag & drop, in plaats van de command line)
+
+Dezelfde installatie als hierboven (`requirements-inference.txt` bevat nu ook
+`gradio`). Start de GUI met:
+
+```bash
+python gui/app.py --n_gpu 0
+```
+
+Dit opent een lokale webpagina (`http://127.0.0.1:7860`, link staat ook in de
+terminal-output). Daar kun je:
+- je twee tracks slepen/uploaden,
+- het cue-point van elke track invullen (seconden waarop 'm volledig
+  uit-/infadet),
+- het model en device kiezen,
+- op **Genereer transitie** klikken,
+- de korte transitie en de volledige mix direct afspelen in de browser.
+
+Extra opties: `--port 7860` om een andere poort te gebruiken, `--share` voor
+een tijdelijke publieke link (bv. om het resultaat op je telefoon te
+beluisteren — gebruik dit niet op een netwerk dat je niet vertrouwt).
+
 ### Troubleshooting A
 - `ModuleNotFoundError` tijdens `pip install -r requirements-inference.txt`:
   zorg dat je `--no-build-isolation` gebruikt (madmom heeft dat nodig om de
@@ -154,6 +176,8 @@ python script/create_mix.py --n_core 4
 - Deel B: feature-extractie, segment-creatie, en pair-matching met zowel
   `rule` als `nn` werken end-to-end; de NN-matcher reproduceert de originele
   referentie-output van de auteur tot ~4 significante cijfers.
+- De GUI (`gui/app.py`): getest via een echte HTTP-call tegen de draaiende
+  server (upload → process → audio-output), vanaf een schone install.
 
 Wat ik **niet** heb kunnen testen (geen GPU in mijn omgeving): het daadwerkelijk
 gebruiken van CUDA. De code is er klaar voor (`--n_gpu`), maar dit is het

@@ -31,3 +31,6 @@ nnAudio==0.3.4
 openunmix==1.3.0
 asteroid-filterbanks==0.4.0
 mido
+
+# gui/app.py (drag & drop GUI)
+gradio

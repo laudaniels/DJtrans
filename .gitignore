@@ -31,5 +31,7 @@ results/*
 pretrained/*
 cache/*
 
+gui/__pycache__/*
+
 .venv/
 .venv_*/
