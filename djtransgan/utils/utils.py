@@ -7,13 +7,15 @@ import random
 import joblib
 import librosa
 import torchaudio
+import soundfile as sf
 import numpy as np
 import torch.nn.functional as F
 
 from djtransgan.config import settings
 
 random.seed(settings.RANDOM_SEED)
-torchaudio.set_audio_backend('soundfile')
+if hasattr(torchaudio, 'set_audio_backend'):
+    torchaudio.set_audio_backend('soundfile')
 
 # Transform
 
@@ -39,17 +41,17 @@ def str_to_time(string):
 
 # I/O
 
-def load_audio(audio_path, 
-               sr=settings.SR, 
-               mono=True, 
-               start=0, 
+def load_audio(audio_path,
+               sr=settings.SR,
+               mono=True,
+               start=0,
                end=None
               ):
-    if 'mp3' in audio_path:
-        torchaudio.set_audio_backend('sox_io')
-    audio, org_sr = torchaudio.load(audio_path, frame_offset=start, num_frames=-1 if end is None else end-start)
+    frames = -1 if end is None else end - start
+    data, org_sr = sf.read(audio_path, start=start, frames=frames, dtype='float32', always_2d=True)
+    audio = torch.from_numpy(data.T)
     audio = to_mono(audio) if mono else audio
-    
+
     if org_sr != sr:
         audio = torchaudio.transforms.Resample(org_sr, sr)(audio)
 
@@ -58,9 +60,9 @@ def load_audio(audio_path,
 def out_audio(data, out_path, sr=settings.SR):
     if isinstance(data, np.ndarray):
         data = torch.from_numpy(data).float()
-    
+
     if len(data.size()) == 1: data = data.unsqueeze(0)
-    torchaudio.save(out_path, data, sr)
+    sf.write(out_path, data.T.cpu().numpy(), sr)
 
 def load_json(file_path):
     with open(file_path, 'r') as file:
@@ -178,6 +180,4 @@ def check_nan(data):
     return (torch.sum(torch.isnan(torch.tensor(data))) >= 1).item()
 
 def get_audio_info(audio_path):
-    if 'mp3' in audio_path:
-        torchaudio.set_audio_backend('sox_io')
-    return torchaudio.info(audio_path)
+    return sf.info(audio_path)

@@ -23,7 +23,7 @@ def select_audio_region(in_data,
                         select_idx):
     
     data_type  = 'tensor' if isinstance(in_data, torch.Tensor) else 'str'
-    length     = in_data.size(-1) if data_type == 'tensor' else get_audio_info(in_data).num_frames
+    length     = in_data.size(-1) if data_type == 'tensor' else get_audio_info(in_data).frames
     cue        = [time_to_samples(c) for c in cue] 
     step       = int(time_to_samples(n_time/2))
     cue_mid    = int(sum(cue) // 2)

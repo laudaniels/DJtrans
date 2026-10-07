@@ -1,4 +1,17 @@
 import numpy as np
+import collections, collections.abc
+
+# madmom's compiled Cython extensions (e.g. ml/hmm.pyx) still reference numpy's
+# removed deprecated type aliases; restore them before madmom is imported.
+for _alias, _builtin in (('int', int), ('float', float), ('bool', bool), ('object', object), ('str', str)):
+    if not hasattr(np, _alias):
+        setattr(np, _alias, _builtin)
+
+# madmom.processors imports MutableSequence from `collections`, which was
+# removed in Python 3.10+ (moved to collections.abc long ago).
+if not hasattr(collections, 'MutableSequence'):
+    collections.MutableSequence = collections.abc.MutableSequence
+
 from madmom.features.downbeats import DBNDownBeatTrackingProcessor, RNNDownBeatProcessor
 
 import torch

@@ -30,3 +30,6 @@ djtransgan/utils/.ipynb_checkpoints/*
 results/*
 pretrained/*
 cache/*
+
+.venv/
+.venv_*/

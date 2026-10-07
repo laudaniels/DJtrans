@@ -14,7 +14,7 @@ import argparse
 from djtransgan.config  import settings
 from djtransgan.utils   import download_pretrained
 from djtransgan.utils   import check_exist, time_to_str, squeeze_dim, get_filename
-from djtransgan.utils   import load_pt, load_audio, out_audio
+from djtransgan.utils   import load_pt, load_audio, out_audio, get_device
 from djtransgan.model   import get_generator
 from djtransgan.dataset import get_dataset, batchlize
 from djtransgan.process import preprocess, postprocess
@@ -37,26 +37,30 @@ def main():
     parser.add_argument('--prev_cue'  , default = 96)
     parser.add_argument('--next_cue'  , default = 30)
     parser.add_argument('--download'  , default = 1)
-    
-     
+    parser.add_argument('--n_gpu'     , default = -1, help='-1 for cpu, else cuda device index (e.g. 0)')
+
+
     args       = parser.parse_args()
-    
+    device     = get_device(args.n_gpu)
+    print(f'Using device: {device}')
+
     if args.download:
         print('Download pre trained start ...')
         download_pretrained()
         print('Download pre trained complete ...')
-        
+
     # Load generator
     print('Loading generator start ...')
     generator = get_generator()
-    
+
     if os.path.exists(args.g_path):
         generator.load_state_dict(load_pt(args.g_path))
     else:
         print(f'{args.g_path} not exist')
+    generator = generator.to(device)
     generator.eval()
     print('Loading generator complete ...')
-    
+
     # Load audio
     print('Loading audio start ...')
     prev_audio = load_audio(args.prev_track)
@@ -64,12 +68,15 @@ def main():
     prev_cue   = args.prev_cue
     next_cue   = args.next_cue
     print('Loading audio complete ...')
-    
+
     # Mix
     print('Mixing audio start ...')
     (pair_audio, timestamps), (pair_audio_for_g, cue_for_g) = preprocess(prev_audio, next_audio, prev_cue, next_cue)
+    pair_audio_for_g         = [audio.to(device) for audio in pair_audio_for_g]
+    cue_for_g                = cue_for_g.to(device)
     mix_audio, mix_out       = generator.infer(*pair_audio_for_g, cue_region=cue_for_g)
-    post_mix_audio, post_cue = postprocess(mix_audio, pair_audio, timestamps, cue_for_g)
+    mix_audio                = mix_audio.to('cpu')
+    post_mix_audio, post_cue = postprocess(mix_audio, pair_audio, timestamps, cue_for_g.to('cpu'))
     saved_id                 = f'{get_filename(args.prev_track)}_{get_filename(args.next_track)}'
     print('Mixing audio complete ...')
     
