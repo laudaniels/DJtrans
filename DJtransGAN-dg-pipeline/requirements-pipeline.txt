@@ -1,0 +1,43 @@
+# Modern, working dependency set for this pipeline (the original requirements.txt
+# targets a 2019-2021 environment - tensorflow-gpu 1.13, cupy-cuda102, CUDA 10 -
+# that no longer installs/runs on current Python or current GPU drivers).
+#
+# Install torch/torchaudio separately first, matching your hardware, e.g.:
+#   CPU only:   pip install torch torchaudio
+#   NVIDIA GPU: pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu124
+# then (madmom needs --no-build-isolation so it can see the cython pin below):
+#   pip install --no-build-isolation -r requirements-pipeline.txt
+# and finally, once:
+#   python script/patch_madmom.py
+#   python script/patch_msaf.py
+#   git clone https://github.com/remyhuang/music-puzzle-games.git music_puzzle_games
+#   python script/patch_music_puzzle_games.py
+#
+# tensorflow is pinned below 2.16: 2.16+ requires numpy>=2, which breaks the
+# compiled madmom extension (built against numpy<2's C ABI). tf 2.15 still
+# supports current CUDA 12 drivers, so this doesn't cost you GPU support.
+
+numpy<2
+scipy
+librosa==0.11.0
+joblib
+matplotlib
+ipython
+pyloudnorm
+pyrubberband
+soundfile
+pydub
+tqdm
+
+cython<3
+madmom==0.16.1
+acoustics==0.2.6
+torchlibrosa==0.1.0
+nnAudio==0.3.4
+openunmix==1.3.0
+asteroid-filterbanks==0.4.0
+mido
+
+msaf==0.1.80
+tensorflow<2.16
+tf_slim

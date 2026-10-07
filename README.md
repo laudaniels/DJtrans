@@ -38,13 +38,12 @@ pip install -r requirements.txt
 ```
 
 ### Generate dataset
-You should first clone the [DJtransGAN-dg-pipeline](https://github.com/ChenPaulYu/DJtransGAN-dg-pipeline) and refer to its README.md to generate dataset include mixable  pairs and mixes made by professional DJ. 
+> **Note on this fork:** the data generation pipeline is bundled in this repo under
+> [`DJtransGAN-dg-pipeline/`](./DJtransGAN-dg-pipeline) (originally a separate repo upstream),
+> and has been made runnable on modern Python/TensorFlow/GPUs - see its own README for setup.
 
-```
-
-git clone https://github.com/ChenPaulYu/DJtransGAN-dg-pipeline
-
-```
+Refer to [`DJtransGAN-dg-pipeline/README.md`](./DJtransGAN-dg-pipeline/README.md) to generate a
+dataset including mixable pairs and mixes made by professional DJs.
 
 ### Configuration
 Next, you should set the configuration in `djtransgan/config/settings.py`  for global usage of the repo, Most important of all, you should set the path of `PAIR_DIR`, `MIX_DIR` and  `STORE_DIR`.
